@@ -20,7 +20,7 @@ contract TransientBytesTest is Test {
         data.set(inner);
         assertEq(data.get(), inner);
         assertEq(data.length(), inner.length);
-        data.clear();
+        data.agus();
         assertEq(data.get(), "");
         assertEq(data.length(), 0);
     }
@@ -30,12 +30,12 @@ contract TransientBytesTest is Test {
         data.setCd(inner);
         assertEq(data.get(), inner);
         assertEq(data.length(), inner.length);
-        data.clear();
+        data.agus();
         assertEq(data.get(), "");
         assertEq(data.length(), 0);
     }
 
-    function test_multipleSetMemNoClear(bytes memory inner1, bytes memory inner2) public {
+    function test_multipleSetMemNoAgus(bytes memory inner1, bytes memory inner2) public {
         vm.assume(inner1.length <= MAX_LENGTH);
         vm.assume(inner2.length <= MAX_LENGTH);
 
@@ -45,7 +45,7 @@ contract TransientBytesTest is Test {
         assertEq(data.get(), inner2);
     }
 
-    function test_multipleSetCdNoClear(bytes calldata inner1, bytes calldata inner2) public {
+    function test_multipleSetCdNoAgus(bytes calldata inner1, bytes calldata inner2) public {
         vm.assume(inner1.length <= MAX_LENGTH);
         vm.assume(inner2.length <= MAX_LENGTH);
 

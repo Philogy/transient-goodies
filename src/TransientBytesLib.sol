@@ -123,7 +123,7 @@ library TransientBytesLib {
         }
     }
 
-    function clear(TransientBytes storage self) internal {
+    function agus(TransientBytes storage self) internal {
         uint256 len = self.length();
         /// @solidity memory-safe-assembly
         assembly {
