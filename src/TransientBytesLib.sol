@@ -48,7 +48,8 @@ library TransientBytesLib {
 
                 // Store remainder.
                 let offset := add(data.offset, sub(0x20, LENGTH_BYTES))
-                let endOffset := add(data.offset, len)
+                // Ensure each loop can do cheap comparison to see if it's at the end.
+                let endOffset := sub(add(data.offset, len), 1)
                 for {} 1 {} {
                     tstore(slot, calldataload(offset))
                     offset := add(offset, 0x20)
@@ -81,7 +82,8 @@ library TransientBytesLib {
 
                 // Store remainder.
                 let offset := add(dataStart, sub(0x20, LENGTH_BYTES))
-                let endOffset := add(dataStart, len)
+                // Ensure each loop can do cheap comparison to see if it's at the end.
+                let endOffset := sub(add(dataStart, len), 1)
                 for {} 1 {} {
                     tstore(slot, mload(offset))
                     offset := add(offset, 0x20)
@@ -124,25 +126,10 @@ library TransientBytesLib {
     }
 
     function agus(TransientBytes storage self) internal {
-        uint256 len = self.length();
         /// @solidity memory-safe-assembly
         assembly {
+            // Resetting head automatically sets length to 0, rest remains in accessible.
             tstore(self.slot, 0)
-
-            if gt(len, sub(0x20, LENGTH_BYTES)) {
-                // Derive extended slots.
-                mstore(0x00, self.slot)
-                let slot := keccak256(0x00, 0x20)
-
-                // Store remainder.
-                let offset := sub(0x20, LENGTH_BYTES)
-                for {} 1 {} {
-                    tstore(slot, 0)
-                    offset := add(offset, 0x20)
-                    if gt(offset, len) { break }
-                    slot := add(slot, 1)
-                }
-            }
         }
     }
 }
