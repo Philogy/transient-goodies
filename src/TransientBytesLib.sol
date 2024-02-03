@@ -52,8 +52,11 @@ library TransientBytesLib {
                 for {} 1 {} {
                     tstore(slot, calldataload(offset))
                     offset := add(offset, 0x20)
-                    if gt(offset, endOffset) { break }
-                    slot := add(slot, 1)
+                    if lt(offset, endOffset) {
+                        slot := add(slot, 1)
+                        continue
+                    }
+                    break
                 }
             }
         }
@@ -85,8 +88,11 @@ library TransientBytesLib {
                 for {} 1 {} {
                     tstore(slot, mload(offset))
                     offset := add(offset, 0x20)
-                    if gt(offset, endOffset) { break }
-                    slot := add(slot, 1)
+                    if lt(offset, endOffset) {
+                        slot := add(slot, 1)
+                        continue
+                    }
+                    break
                 }
             }
         }
@@ -115,8 +121,11 @@ library TransientBytesLib {
                 for {} 1 {} {
                     mstore(offset, tload(slot))
                     offset := add(offset, 0x20)
-                    if gt(offset, endOffset) { break }
-                    slot := add(slot, 1)
+                    if lt(offset, endOffset) {
+                        slot := add(slot, 1)
+                        continue
+                    }
+                    break
                 }
                 mstore(endOffset, 0)
             }
@@ -124,25 +133,9 @@ library TransientBytesLib {
     }
 
     function agus(TransientBytes storage self) internal {
-        uint256 len = self.length();
         /// @solidity memory-safe-assembly
         assembly {
             tstore(self.slot, 0)
-
-            if gt(len, sub(0x20, LENGTH_BYTES)) {
-                // Derive extended slots.
-                mstore(0x00, self.slot)
-                let slot := keccak256(0x00, 0x20)
-
-                // Store remainder.
-                let offset := sub(0x20, LENGTH_BYTES)
-                for {} 1 {} {
-                    tstore(slot, 0)
-                    offset := add(offset, 0x20)
-                    if gt(offset, len) { break }
-                    slot := add(slot, 1)
-                }
-            }
         }
     }
 }
