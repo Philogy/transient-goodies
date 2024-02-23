@@ -2,7 +2,12 @@
 pragma solidity ^0.8.24;
 
 /// @author philogy <https://github.com/philogy>
+
 struct tuint256 {
+    uint256 __placeholder;
+}
+
+struct tint256 {
     uint256 __placeholder;
 }
 
@@ -20,6 +25,13 @@ using TransientPrimitivesLib for taddress global;
 
 library TransientPrimitivesLib {
     function get(tuint256 storage ptr) internal view returns (uint256 value) {
+        /// @solidity memory-safe-assembly
+        assembly {
+            value := tload(ptr.slot)
+        }
+    }
+
+    function get(tint256 storage ptr) internal view returns (int256 value) {
         /// @solidity memory-safe-assembly
         assembly {
             value := tload(ptr.slot)
@@ -46,6 +58,14 @@ library TransientPrimitivesLib {
             tstore(ptr.slot, value)
         }
     }
+
+    function set(tint256 storage ptr, int256 value) internal  {
+        /// @solidity memory-safe-assembly
+        assembly {
+            tstore(ptr.slot, value)
+        }
+    }
+
 
     function set(tbytes32 storage ptr, bytes32 value) internal {
         /// @solidity memory-safe-assembly
