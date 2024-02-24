@@ -20,6 +20,7 @@ struct taddress {
 }
 
 using TransientPrimitivesLib for tuint256 global;
+using TransientPrimitivesLib for tint256 global;
 using TransientPrimitivesLib for tbytes32 global;
 using TransientPrimitivesLib for taddress global;
 
@@ -59,13 +60,28 @@ library TransientPrimitivesLib {
         }
     }
 
-    function set(tint256 storage ptr, int256 value) internal  {
+    function inc(tuint256 storage ptr, uint256 change) internal {
+        ptr.set(ptr.get() + change);
+    }
+
+    function dec(tuint256 storage ptr, uint256 change) internal {
+        ptr.set(ptr.get() - change);
+    }
+
+    function set(tint256 storage ptr, int256 value) internal {
         /// @solidity memory-safe-assembly
         assembly {
             tstore(ptr.slot, value)
         }
     }
 
+    function inc(tint256 storage ptr, int256 change) internal {
+        ptr.set(ptr.get() + change);
+    }
+
+    function dec(tint256 storage ptr, int256 change) internal {
+        ptr.set(ptr.get() - change);
+    }
 
     function set(tbytes32 storage ptr, bytes32 value) internal {
         /// @solidity memory-safe-assembly
