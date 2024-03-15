@@ -51,7 +51,7 @@ contract TransientPrimitivesTest is Test {
     function test_increaseUint256(uint256 start, uint256 increase) public {
         increase = bound(increase, 0, type(uint256).max - start);
         uint256_var.set(start);
-        uint256_var.inc(increase);
+        assertEq(start + increase, uint256_var.inc(increase));
         assertEq(start + increase, uint256_var.get());
     }
 
@@ -63,11 +63,11 @@ contract TransientPrimitivesTest is Test {
         uint256_var.inc(increase);
     }
 
-    function test_decreaseUint256(uint256 start, uint256 increase) public {
-        increase = bound(increase, 0, type(uint256).max - start);
+    function test_decreaseUint256(uint256 start, uint256 decrease) public {
+        decrease = bound(decrease, 0, start);
         uint256_var.set(start);
-        uint256_var.inc(increase);
-        assertEq(start + increase, uint256_var.get());
+        assertEq(start - decrease, uint256_var.dec(decrease));
+        assertEq(start - decrease, uint256_var.get());
     }
 
     function test_decreaseUint256RevertsOnUnderflow(uint256 start, uint256 increase) public {
@@ -83,7 +83,7 @@ contract TransientPrimitivesTest is Test {
         int256 lowerBound = start >= 0 ? type(int256).min : type(int256).min - start;
         change = bound(change, lowerBound, upperBound);
         int256_var.set(start);
-        int256_var.inc(change);
+        assertEq(start + change, int256_var.inc(change));
         assertEq(start + change, int256_var.get());
     }
 
@@ -105,7 +105,7 @@ contract TransientPrimitivesTest is Test {
         int256 lowerBound = start < 0 ? type(int256).min : start - type(int256).max;
         change = bound(change, lowerBound, upperBound);
         int256_var.set(start);
-        int256_var.dec(change);
+        assertEq(start - change, int256_var.dec(change));
         assertEq(start - change, int256_var.get());
     }
 

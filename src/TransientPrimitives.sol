@@ -60,12 +60,12 @@ library TransientPrimitivesLib {
         }
     }
 
-    function inc(tuint256 storage ptr, uint256 change) internal {
-        ptr.set(ptr.get() + change);
+    function inc(tuint256 storage ptr, uint256 change) internal returns (uint256 newValue) {
+        ptr.set(newValue = ptr.get() + change);
     }
 
-    function dec(tuint256 storage ptr, uint256 change) internal {
-        ptr.set(ptr.get() - change);
+    function dec(tuint256 storage ptr, uint256 change) internal returns (uint256 newValue) {
+        ptr.set(newValue = ptr.get() - change);
     }
 
     function set(tint256 storage ptr, int256 value) internal {
@@ -75,12 +75,12 @@ library TransientPrimitivesLib {
         }
     }
 
-    function inc(tint256 storage ptr, int256 change) internal {
-        ptr.set(ptr.get() + change);
+    function inc(tint256 storage ptr, int256 change) internal returns (int256 newValue) {
+        ptr.set(newValue = ptr.get() + change);
     }
 
-    function dec(tint256 storage ptr, int256 change) internal {
-        ptr.set(ptr.get() - change);
+    function dec(tint256 storage ptr, int256 change) internal returns (int256 newValue) {
+        ptr.set(newValue = ptr.get() - change);
     }
 
     function set(tbytes32 storage ptr, bytes32 value) internal {
