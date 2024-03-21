@@ -45,4 +45,13 @@ contract PayableMulticallableTest is Test {
         assertEq(multicall.balanceOf(user), 4.9 ether);
         assertEq(user.balance, 0.1 ether);
     }
+
+    function test_standalonePaybable() public {
+        address user = makeAddr("user");
+        uint256 amount = 3.238 ether;
+        hoax(user, amount);
+        multicall.deposit{value: amount}(amount);
+
+        assertEq(multicall.balanceOf(user), amount);
+    }
 }

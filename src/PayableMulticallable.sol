@@ -13,7 +13,7 @@ abstract contract PayableMulticallable {
     /// @dev Lowest bit indicates that the lock is set.
     tuint256 private _topLevelValueAndLock;
 
-    modifier multicallPayable() {
+    modifier standalonePayable() {
         uint256 valueAndLock = _topLevelValueAndLock.get();
         bool topLevel = valueAndLock & 1 == 0;
         if (topLevel) _topLevelValueAndLock.set(_LOCK_FLAG_BIT | (msg.value << 1));

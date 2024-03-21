@@ -7,7 +7,7 @@ import {PayableMulticallable} from "../../src/PayableMulticallable.sol";
 contract Multicallable is PayableMulticallable {
     mapping(address => uint256) public balanceOf;
 
-    function deposit(uint256 amount) external payable multicallPayable {
+    function deposit(uint256 amount) external payable standalonePayable {
         balanceOf[msg.sender] += useValue(amount);
     }
 
