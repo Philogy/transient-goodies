@@ -33,6 +33,18 @@ contract PayableMulticallableTest is Test {
         assertEq(user.balance, 0.1 ether);
     }
 
+    function test_allowsIndividualRevert() public {
+        address user = makeAddr("user");
+        hoax(user, 3 ether);
+        bytes[] memory data = new bytes[](3);
+        data[0] = abi.encodeCall(multicall.deposit, (1 ether));
+        data[1] = abi.encodeCall(multicall.deposit, (2.1 ether));
+        data[2] = abi.encodeCall(multicall.deposit, (1 ether));
+        multicall.multicall{value: 3 ether}(false, data);
+
+        assertEq(multicall.balanceOf(user), 2 ether);
+    }
+
     function test_returnResetsValue() public {
         address user = makeAddr("user");
         hoax(user, 5 ether);
