@@ -22,7 +22,7 @@ abstract contract PayableMulticallable {
         if (topLevel) _topLevelValueAndLock.set(0);
     }
 
-    function multicall(bytes[] calldata data) external payable returns (bytes[] memory) {
+    function multicall(bool requireSuccess, bytes[] calldata data) external payable returns (bytes[] memory) {
         // Taken from Solady's Multicallable (https://github.com/Vectorized/solady/blob/main/src/utils/Multicallable.sol).
         assembly {
             let wasLocked := and(tload(_topLevelValueAndLock.slot), _LOCK_FLAG_BIT)
@@ -53,8 +53,9 @@ abstract contract PayableMulticallable {
                     add(o, 0x20), // The offset of the current bytes' bytes.
                     calldataload(o) // The length of the current bytes.
                 )
-                if iszero(delegatecall(gas(), address(), m, calldataload(o), codesize(), 0x00)) {
-                    // Bubble up the revert if the delegatecall reverts.
+                let ret := delegatecall(gas(), address(), m, calldataload(o), codesize(), 0x00)
+                if and(requireSuccess, iszero(ret)) {
+                    // Bubble up the revert if success is required and the delegatecall reverts.
                     returndatacopy(0x00, 0x00, returndatasize())
                     revert(0x00, returndatasize())
                 }

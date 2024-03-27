@@ -17,7 +17,7 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (amount));
         data[1] = abi.encodeCall(multicall.deposit, (amount));
         vm.expectRevert(stdError.arithmeticError);
-        multicall.multicall{value: amount}(data);
+        multicall.multicall{value: amount}(true, data);
     }
 
     function test_allowsNormalMulticall() public {
@@ -27,7 +27,7 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (2 ether));
         data[1] = abi.encodeCall(multicall.deposit, (2.9 ether));
         data[2] = abi.encodeCall(multicall.returnRemainder, ());
-        multicall.multicall{value: 5 ether}(data);
+        multicall.multicall{value: 5 ether}(true, data);
 
         assertEq(multicall.balanceOf(user), 4.9 ether);
         assertEq(user.balance, 0.1 ether);
@@ -40,7 +40,7 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (2 ether));
         data[1] = abi.encodeCall(multicall.deposit, (2.9 ether));
         data[2] = abi.encodeCall(multicall.returnRemainder, ());
-        multicall.multicall{value: 5 ether}(data);
+        multicall.multicall{value: 5 ether}(true, data);
 
         assertEq(multicall.balanceOf(user), 4.9 ether);
         assertEq(user.balance, 0.1 ether);
