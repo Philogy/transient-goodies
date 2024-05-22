@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test} from "forge-std/Test.sol";
+import {console,Test} from "forge-std/Test.sol";
 import {stdError} from "forge-std/StdError.sol";
 import {Multicallable} from "./mocks/Multicallable.sol";
 
@@ -40,9 +40,12 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (1 ether));
         data[1] = abi.encodeCall(multicall.deposit, (2.1 ether));
         data[2] = abi.encodeCall(multicall.deposit, (1 ether));
-        multicall.multicall{value: 3 ether}(false, data);
+        bytes[] memory responses = multicall.multicall{value: 3 ether}(false, data);
 
         assertEq(multicall.balanceOf(user), 2 ether);
+        assertEq(abi.decode(responses[0], (uint256)), 1 ether);
+        assertEq(responses[1], abi.encodeWithSignature("Panic(uint256)", (0x11)));
+        assertEq(abi.decode(responses[2], (uint256)), 2 ether);
     }
 
     function test_returnResetsValue() public {
