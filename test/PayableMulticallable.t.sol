@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {console,Test} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {stdError} from "forge-std/StdError.sol";
 import {Multicallable} from "./mocks/Multicallable.sol";
 
