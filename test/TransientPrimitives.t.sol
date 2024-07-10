@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test, stdError} from "forge-std/Test.sol";
-import {tuint256, tint256, tbytes32, taddress} from "../src/TransientPrimitives.sol";
+import {TransientPrimitivesLib, tuint256, tint256, tbytes32, taddress} from "../src/TransientPrimitives.sol";
 
 /// @author philogy <https://github.com/philogy>
 contract TransientPrimitivesTest is Test {
@@ -61,6 +61,50 @@ contract TransientPrimitivesTest is Test {
         uint256_var.set(start);
         vm.expectRevert(stdError.arithmeticError);
         uint256_var.inc(increase);
+    }
+
+    function test_signedUint256Increase(uint256 start, int256 delta) public {
+        uint256 absDelta;
+        unchecked {
+            absDelta = delta < 0 ? uint256(-delta) : uint256(delta);
+        }
+        bool overflows = delta < 0 ? absDelta > start : type(uint256).max - start < absDelta;
+
+        uint256_var.set(start);
+        if (overflows) {
+            vm.expectRevert(TransientPrimitivesLib.ArithmeticOverflowUnderflow.selector);
+            uint256_var.inc(delta);
+        } else {
+            uint256_var.inc(delta);
+            uint256 end = uint256_var.get();
+            if (delta < 0) {
+                assertEq(end, start - absDelta);
+            } else {
+                assertEq(end, start + absDelta);
+            }
+        }
+    }
+
+    function test_signedUint256Decrease(uint256 start, int256 delta) public {
+        uint256 absDelta;
+        unchecked {
+            absDelta = delta < 0 ? uint256(-delta) : uint256(delta);
+        }
+        bool overflows = delta < 0 ? type(uint256).max - start < absDelta : absDelta > start;
+
+        uint256_var.set(start);
+        if (overflows) {
+            vm.expectRevert(TransientPrimitivesLib.ArithmeticOverflowUnderflow.selector);
+            uint256_var.dec(delta);
+        } else {
+            uint256_var.dec(delta);
+            uint256 end = uint256_var.get();
+            if (delta < 0) {
+                assertEq(end, start + absDelta);
+            } else {
+                assertEq(end, start - absDelta);
+            }
+        }
     }
 
     function test_decreaseUint256(uint256 start, uint256 decrease) public {
