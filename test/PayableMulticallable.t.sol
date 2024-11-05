@@ -17,7 +17,7 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (amount));
         data[1] = abi.encodeCall(multicall.deposit, (amount));
         vm.expectRevert(stdError.arithmeticError);
-        multicall.multicall{value: amount}(data);
+        multicall.multicall{value: amount}(true, data);
     }
 
     function test_allowsNormalMulticall() public {
@@ -27,10 +27,25 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (2 ether));
         data[1] = abi.encodeCall(multicall.deposit, (2.9 ether));
         data[2] = abi.encodeCall(multicall.returnRemainder, ());
-        multicall.multicall{value: 5 ether}(data);
+        multicall.multicall{value: 5 ether}(true, data);
 
         assertEq(multicall.balanceOf(user), 4.9 ether);
         assertEq(user.balance, 0.1 ether);
+    }
+
+    function test_allowsIndividualRevert() public {
+        address user = makeAddr("user");
+        hoax(user, 3 ether);
+        bytes[] memory data = new bytes[](3);
+        data[0] = abi.encodeCall(multicall.deposit, (1 ether));
+        data[1] = abi.encodeCall(multicall.deposit, (2.1 ether));
+        data[2] = abi.encodeCall(multicall.deposit, (1 ether));
+        bytes[] memory responses = multicall.multicall{value: 3 ether}(false, data);
+
+        assertEq(multicall.balanceOf(user), 2 ether);
+        assertEq(abi.decode(responses[0], (uint256)), 1 ether);
+        assertEq(responses[1], abi.encodeWithSignature("Panic(uint256)", (0x11)));
+        assertEq(abi.decode(responses[2], (uint256)), 2 ether);
     }
 
     function test_returnResetsValue() public {
@@ -40,7 +55,7 @@ contract PayableMulticallableTest is Test {
         data[0] = abi.encodeCall(multicall.deposit, (2 ether));
         data[1] = abi.encodeCall(multicall.deposit, (2.9 ether));
         data[2] = abi.encodeCall(multicall.returnRemainder, ());
-        multicall.multicall{value: 5 ether}(data);
+        multicall.multicall{value: 5 ether}(true, data);
 
         assertEq(multicall.balanceOf(user), 4.9 ether);
         assertEq(user.balance, 0.1 ether);
